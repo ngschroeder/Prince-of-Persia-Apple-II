@@ -73,7 +73,9 @@ The 3.5" `.hdv` image works with a UniDisk 3.5 drive configuration.
 Press **Ctrl+K** for keyboard controls, **Ctrl+J** for joystick.
 
 I/K/J/L - Move
+
 U/O - Diagonal Jump
+
 H - Shoot fireball (with every apology possible to Jordan Mechner)
 
 ---
