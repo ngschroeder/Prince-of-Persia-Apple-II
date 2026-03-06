@@ -2,6 +2,10 @@
 
 This is a fork of adamgreen's fork of Jordan Mechner's original source, updated with the help of Claude Code. All original licensing applies to all of the work contained herein, this is just a learning experiment.
 
+
+https://github.com/user-attachments/assets/b3b38e97-0e40-4beb-baf4-248649ed490a
+
+
 ## Building on Modern macOS
 
 The original build tools were 32-bit binaries that no longer run on macOS Catalina and later. This fork includes rebuilt 64-bit tools and instructions for getting the project to build on modern Macs.
