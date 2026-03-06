@@ -1,3 +1,81 @@
+# Credits
+
+This is a fork of adamgreen's fork of Jordan Mechner's original source, updated with the help of Claude Code. All original licensing applies to all of the work contained herein, this is just a learning experiment.
+
+## Building on Modern macOS
+
+The original build tools were 32-bit binaries that no longer run on macOS Catalina and later. This fork includes rebuilt 64-bit tools and instructions for getting the project to build on modern Macs.
+
+## Prerequisites
+
+- **Xcode Command Line Tools**: `xcode-select --install`
+- **make**: included with Xcode CLT
+
+The assembler (`snap`) and disk imager (`crackle`) in `Build/osx32/` have been replaced with 64-bit x86_64 builds compiled from [adamgreen/snapNcrackle](https://github.com/adamgreen/snapNcrackle). On Apple Silicon Macs, these run via Rosetta 2.
+
+### Rebuilding snap/crackle from source (optional)
+
+Only needed if the included binaries don't work on your system:
+
+```bash
+cd /tmp
+git clone https://github.com/adamgreen/snapNcrackle.git
+cd snapNcrackle
+```
+
+Add `-Wno-deprecated-declarations` to `CPPUTEST_WARNINGFLAGS` in `libcommon/makefile`, `libsnap/makefile`, and `libcrackle/makefile`. Also add `-Wno-varargs` to `libcrackle/makefile`. Then:
+
+```bash
+make clean all CFG=Release
+cp snap/Release/snap /path/to/Prince-of-Persia-Apple-II/Build/osx32/snap
+cp crackle/Release/crackle /path/to/Prince-of-Persia-Apple-II/Build/osx32/crackle
+```
+
+## Build
+
+```bash
+make clean all
+```
+
+This produces three disk images:
+
+| File | Format | Size |
+|------|--------|------|
+| `PrinceOfPersia_3.5.hdv` | 3.5" ProDOS block image | 800 KB |
+| `PrinceOfPersia_5.25_SideA.nib` | 5.25" nibble image (Side A) | 228 KB |
+| `PrinceOfPersia_5.25_SideB.nib` | 5.25" nibble image (Side B) | 228 KB |
+
+Assembly warnings about `DO/IF` and `fin` directives in GRAFIX.S and SPECIALK.S are expected and harmless.
+
+### Build variants
+
+```bash
+make clean all RELEASE_PATCH=1   # Apply release patches (disables cheats, updates version date)
+make clean all VERBOSE=1         # Show assembler/imager commands as they run
+```
+
+## Running
+
+The 5.25" `.nib` images work in [Virtual II](https://virtualii.com/) (macOS) or any Apple IIe emulator:
+
+1. Configure an **Apple IIe** with two 5.25" floppy drives (Disk II in slot 6)
+2. Insert `PrinceOfPersia_5.25_SideA.nib` into Drive 1 and boot
+3. When prompted, swap Drive 1 to `PrinceOfPersia_5.25_SideB.nib`
+
+The 3.5" `.hdv` image works with a UniDisk 3.5 drive configuration.
+
+## Controls
+
+Press **Ctrl+K** for keyboard controls, **Ctrl+J** for joystick.
+
+I/K/J/L - Move
+U/O - Diagonal Jump
+H - Shoot fireball (with every apology possible to Jordan Mechner)
+
+---
+
+# Original README
+
 # Archived - June 10th, 2021
 This fork is no longer under active development.
 
@@ -13,7 +91,7 @@ For those who'd like to dig into the source code itself, I've posted an explanat
 
 Beyond that, please don't ask me to explain anything about the source code, because I don't remember! I hung up my 6502 programming guns in October 1989, and after two decades working primarily as a writer, game designer, and creative director, to say my coding skills are rusty would be an understatement.
 
-Thanks to [Jason Scott] (http://www.textfiles.com) and [Tony Diaz] (http://www.apple2.org) for successfully extracting the source code from a 22-year-old 3.5" floppy disk archive, a task that took most of a long day and night, and would have taken much longer if not for Tony's incredible expertise, perseverence, and well-maintained collection of vintage Apple hardware. 
+Thanks to [Jason Scott] (http://www.textfiles.com) and [Tony Diaz] (http://www.apple2.org) for successfully extracting the source code from a 22-year-old 3.5" floppy disk archive, a task that took most of a long day and night, and would have taken much longer if not for Tony's incredible expertise, perseverence, and well-maintained collection of vintage Apple hardware.
 
 We extracted and posted the 6502 code because it was a piece of computer history that could be of interest to others, and because if we hadn't, it might have been lost for all time. We did this for fun, not profit. As the author and copyright holder of this source code, I personally have no problem with anyone studying it, modifying it, attempting to run it, etc. Please understand that this does NOT constitute a grant of rights of any kind in Prince of Persia, which is an ongoing Ubisoft game franchise. Ubisoft alone has the right to make and distribute Prince of Persia games.
 

@@ -103,6 +103,8 @@ kshowtime = " "
 kflipx = "x"-CTRL
 kflipy = "y"-CTRL
 
+kfireball = "h"
+
 *  Special keys (development)
 
 knextlevel = ")"
@@ -349,7 +351,11 @@ LegitKeys
  sta timerequest
  rts
 
-:19
+:19 cmp #kfireball
+ bne :20
+ jmp DoFireball
+
+:20
 ]rts rts
 
 *-------------------------------
@@ -1344,6 +1350,54 @@ STROBE jsr keys ;Detect & respond to keypresses
  jsr controller
 ]rts rts
 
+*-------------------------------
+*
+*  D O   F I R E B A L L
+*
+*  Spawn fireball mob in kid's facing direction
+*
+*-------------------------------
+fbmaxmob = mobspace-1
+
+DoFireball
+ lda KidLife
+ bpl :rts ;kid is dead
+
+ ldx nummob
+ cpx #fbmaxmob
+ bcs :rts ;mob list full
+
+ inx
+ stx nummob
+
+ lda KidBlockX
+ asl
+ asl ;blockx * 4 = byte column
+ clc
+ adc #2 ;center of block
+ sta mobx,x
+
+ lda KidY
+ sec
+ sbc #24 ;chest height
+ sta moby,x
+
+ lda KidScrn
+ sta mobscrn,x
+
+ lda #1 ;TypeFireball
+ sta mobtype,x
+
+ lda KidFace
+ sta moblevel,x ;0=right, ff=left
+
+ lda #1
+ sta mobvel,x ;active (positive, non-zero)
+
+ lda #SwordClash1
+ jsr addsound
+
+:rts rts
 
 *-------------------------------
  lst

@@ -1594,7 +1594,10 @@ ANIMMOBS
 
  jsr animmob ;animate MOB #x
 
+ lda mobtype
+ bne :nocr ;skip crush check for non-floor mobs
  jsr checkcrush ;did we just crush a character?
+:nocr
 
  ldx tempnt
  jsr savemob
@@ -1641,13 +1644,14 @@ ANIMMOBS
 *-------------------------------
 animmob
  lda mobtype
- bne :done
+ bne :fb
  jsr mobfloor
-:done
  lda mobvel
  bpl ]rts ;is object stopping?
  inc mobvel ;yes
 ]rts rts
+
+:fb jmp animfireball ;fireball returns directly, bypassing mobvel inc
 
 *-------------------------------
 *
@@ -1989,9 +1993,11 @@ ADDMOBS
  jsr loadmob
 
  lda mobtype
- bne :1
- jsr ATM ;Add this MOB
-:1
+ bne :fb
+ jsr ATM ;Add this MOB (falling floor)
+ jmp :amnext
+:fb jsr renderfb ;Add fireball to bg list
+:amnext
  ldx tempnt
  dex
  bne :loop
@@ -2166,6 +2172,94 @@ shakeit
  sta trdirec
 
  jmp addtrob ;add floor to trans list
+
+*-------------------------------
+*
+*  A N I M   F I R E B A L L
+*
+*  Move horizontally; check for opponent collision
+*
+*-------------------------------
+animfireball
+ lda mobvel
+ bmi ]rts
+
+ lda moblevel ;0=right, ff=left
+ bne :left
+
+ inc mobx
+ lda mobx
+ cmp #39
+ bcs :expire
+ bcc :check
+
+:left
+ dec mobx
+ beq :expire
+
+:check
+ lda mobscrn
+ cmp ShadScrn
+ bne :done
+ lda ShadLife
+ bpl :done ;opponent dead
+ lda mobx
+ lsr
+ lsr
+ cmp ShadBlockX
+ bne :done
+
+* Hit opponent
+ lda #-1
+ sta ChgOppStr
+
+:expire
+ lda #$ff
+ sta mobvel ;mark for deletion
+
+:done
+]rts rts
+
+*-------------------------------
+*
+*  R E N D E R   F I R E B A L L
+*
+*  Shimmer + 5px crop for rounder shape + 1-col trail
+*
+*-------------------------------
+renderfb
+ lda mobscrn
+ cmp VisScrn
+ bne :rts
+
+ lda mobvel
+ bmi :rts
+
+ lda mobx
+ cmp #39
+ bcs :rts
+ sta XCO
+ and #3 ;shimmer: cycle flame image by position
+ clc
+ adc #$52
+ sta IMAGE
+
+ lda moby
+ cmp #192
+ bcs :rts
+ sta YCO
+
+ lda #0
+ sta OFFSET
+ lda #sta ;sta = 2 = layrsave type
+ sta OPACITY
+
+* Main fireball (cropped 5px shorter)
+
+ jsr addmidezo ;A=2: layrsave
+ lda #5
+ sta midCU,x ;crop top 5 pixels for rounder shape
+:rts rts
 
 *-------------------------------
  lst
